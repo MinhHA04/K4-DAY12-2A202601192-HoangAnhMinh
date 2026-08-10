@@ -90,14 +90,35 @@ done; echo
 
 ## Kết Quả Chạy Thật
 
-Dán output của các lệnh trên vào đây:
+Dán output của các lệnh trên vào đây. Kết quả kiểm tra trực tiếp ngày
+2026-08-10 trên `https://day12-chat-m9u9.onrender.com`:
 
+```text
+1. GET /healthz
+   HTTP 200
+   {"status":"ok","service":"day12-chat-service","version":"1.0.0"}
+
+2. GET /readyz
+   HTTP 200
+   {"status":"ready","redis":true}
+
+3. POST /chat không có token
+   HTTP 401
+   WWW-Authenticate: Bearer
+   {"detail":"invalid or missing bearer token"}
+
+4. POST /chat với Bearer token
+   HTTP 200
+   client_id="sv-test", turns_before=0, usd_cost=0.00002205
+   usage={"prompt":3,"completion":36}
+
+5. Rate limit, 15 request liên tiếp
+   200 200 200 200 200 200 200 200 200 429 429 429 429 429 429
+   Response cuối: {"detail":"rate limit exceeded"}
 ```
-GET /healthz -> 200 {"status":"ok","service":"day12-chat-service","version":"1.0.0"}
-GET /readyz  -> 200 {"status":"ready","redis":true}
-POST /chat (không token) -> 401, header WWW-Authenticate: Bearer
-POST /chat (Bearer token local) -> 200, trả về reply và usage
-```
+
+Vòng lặp rate limit có 9 lần 200 vì request ở bước 4 đã sử dụng 1 trong 10
+token ban đầu của client `sv-test`; các request còn lại trả 429 đúng thiết kế.
 
 ### Kết luận lần kiểm tra 2026-08-10
 
@@ -105,9 +126,8 @@ POST /chat (Bearer token local) -> 200, trả về reply và usage
 - Render Key Value đã kết nối đúng: `/readyz` trả 200 và `redis=true`.
 - `/chat` với `DEPLOY_API_TOKEN` local trả 200, chứng minh `API_TOKEN` trên
   Render đã được đồng bộ đúng.
-- Bản deploy cũ trả 404 tại `/` vì hợp đồng ban đầu không khai báo route gốc.
-  Source hiện đã bổ sung `GET /`; cần deploy phiên bản mới để mở domain trực
-  tiếp và nhận trang thông tin API thay vì `{"detail":"Not Found"}`.
+- Workflow CI/CD đã deploy phiên bản có `GET /`; mở domain trực tiếp hiện trả
+  200 cùng thông tin service và các đường dẫn `/docs`, `/healthz`, `/readyz`.
 
 ## Ảnh Chụp Màn Hình
 

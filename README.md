@@ -312,8 +312,8 @@ Nộp **link repository** lên codelab. Repo phải ở chế độ public.
 - [x] `python grade.py` — xem điểm, mục tiêu ≥ 75/100
 - [x] `exercises.md` — đủ 10 câu, viết bằng lời của mình
 - [x] `DEPLOYMENT.md` — có Public URL thật, không dán giá trị token
-- [ ] `screenshots/` — có ảnh dashboard và ảnh gọi `/healthz`
+- [x] `screenshots/` — có ảnh dashboard và ảnh gọi `/healthz`
 - [x] `.env` **không** nằm trong repo (`git ls-files | grep .env` chỉ ra `.env.example`)
 - [x] Không còn `NotImplementedError` nào trong `app/`
 - [x] Có commit ở nhiều mốc thời gian, không phải một commit duy nhất
-- [ ] *(Bonus)* `.github/workflows/ci.yml` chạy xanh, README có badge `passing`
+- [x] *(Bonus)* `.github/workflows/ci.yml` chạy xanh, README có badge `passing`
