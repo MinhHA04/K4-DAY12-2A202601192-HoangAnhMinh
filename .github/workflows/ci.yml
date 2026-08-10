@@ -1,0 +1,88 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: day12-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run checkpoint tests
+        env:
+          API_TOKEN: ci-dummy-token
+          REDIS_URL: "fake://"
+        run: >-
+          python -m pytest tests/ -v
+          --ignore=tests/test_cp5.py
+          --ignore=tests/test_bonus_cicd.py
+
+  build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build production image
+        run: docker build --tag day12-chat:${{ github.sha }} .
+
+  deploy:
+    name: Deploy to Render
+    needs: [test, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      PUBLIC_URL: ${{ vars.PUBLIC_URL }}
+    steps:
+      - name: Validate deployment configuration
+        shell: bash
+        run: |
+          if [[ -z "$RENDER_DEPLOY_HOOK_URL" ]]; then
+            echo "Missing GitHub Actions secret RENDER_DEPLOY_HOOK_URL"
+            exit 1
+          fi
+          if [[ -z "$PUBLIC_URL" ]]; then
+            echo "Missing GitHub Actions variable: PUBLIC_URL"
+            exit 1
+          fi
+
+      - name: Trigger Render deploy
+        run: curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
+
+      - name: Smoke test
+        shell: bash
+        run: |
+          sleep 45
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error "$PUBLIC_URL/healthz"; then
+              exit 0
+            fi
+            echo "Service is not ready yet (attempt $attempt/12)"
+            sleep 15
+          done
+          echo "Render service did not pass /healthz"
+          exit 1

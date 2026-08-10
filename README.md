@@ -1,5 +1,7 @@
 # K4 — Ngày 12: Hạ Tầng Cloud & Deployment (14h00–18h00)
 
+[![CI/CD](https://github.com/MinhHA04/K4-DAY12-2A202601192-HoangAnhMinh/actions/workflows/ci.yml/badge.svg)](https://github.com/MinhHA04/K4-DAY12-2A202601192-HoangAnhMinh/actions/workflows/ci.yml)
+
 Đưa một chat service từ `localhost:8000` lên một địa chỉ công khai mà người khác
 gọi được, có bảo mật, có giới hạn chi phí, và không sập khi bạn deploy bản mới.
 
@@ -115,6 +117,7 @@ Chi tiết từng bước: [LAB_GUIDE.md](LAB_GUIDE.md).
 
 | | |
 |---|---|
+| `GET /` | Trang thông tin API và các đường dẫn sử dụng |
 | `GET /healthz` | Liveness — 200 khi process sống, 503 khi đang tắt dần |
 | `GET /readyz` | Readiness — 200 khi nối được Redis, 503 khi không |
 | `POST /chat` | Endpoint chính, cần `Authorization: Bearer <token>` |
@@ -304,13 +307,13 @@ Nộp **link repository** lên codelab. Repo phải ở chế độ public.
 
 ## Danh Sách Kiểm Tra Trước Khi Nộp
 
-- [ ] Repo đúng tên `K4-DAY12-<MãHV>-<HọTên>`, viết liền không dấu
-- [ ] `pytest tests/ -v` — đã chạy và biết rõ test nào còn rớt, vì sao
-- [ ] `python grade.py` — xem điểm, mục tiêu ≥ 75/100
-- [ ] `exercises.md` — đủ 10 câu, viết bằng lời của mình
-- [ ] `DEPLOYMENT.md` — có Public URL thật, không dán giá trị token
+- [x] Repo đúng tên `K4-DAY12-<MãHV>-<HọTên>`, viết liền không dấu
+- [x] `pytest tests/ -v` — đã chạy và biết rõ test nào còn rớt, vì sao
+- [x] `python grade.py` — xem điểm, mục tiêu ≥ 75/100
+- [x] `exercises.md` — đủ 10 câu, viết bằng lời của mình
+- [x] `DEPLOYMENT.md` — có Public URL thật, không dán giá trị token
 - [ ] `screenshots/` — có ảnh dashboard và ảnh gọi `/healthz`
-- [ ] `.env` **không** nằm trong repo (`git ls-files | grep .env` chỉ ra `.env.example`)
-- [ ] Không còn `NotImplementedError` nào trong `app/`
-- [ ] Có commit ở nhiều mốc thời gian, không phải một commit duy nhất
+- [x] `.env` **không** nằm trong repo (`git ls-files | grep .env` chỉ ra `.env.example`)
+- [x] Không còn `NotImplementedError` nào trong `app/`
+- [x] Có commit ở nhiều mốc thời gian, không phải một commit duy nhất
 - [ ] *(Bonus)* `.github/workflows/ci.yml` chạy xanh, README có badge `passing`

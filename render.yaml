@@ -1,7 +1,9 @@
 # CP5 — Cấu hình deploy Render (dùng nếu bạn chọn Render).
 #
 # Render đọc file này khi bạn tạo Blueprint từ repo GitHub.
-# `sync: false` = Render hỏi giá trị lúc deploy, KHÔNG lưu secret vào repo.
+# `sync: false` = Render hỏi giá trị khi tạo Blueprint lần đầu và KHÔNG lưu
+# secret vào repo. Khi Blueprint đã tồn tại, Render bỏ qua giá trị này lúc
+# sync/redeploy; muốn đổi token phải sửa API_TOKEN trong Dashboard > Environment.
 
 services:
   - type: web
@@ -9,9 +11,14 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
+    # GitHub Actions gọi Deploy Hook sau khi test và build đều pass.
+    # Tắt auto-deploy theo commit để code lỗi không lên Render trước CI.
+    autoDeployTrigger: off
     healthCheckPath: /healthz
     envVars:
       - key: API_TOKEN
+        # Sau lần tạo Blueprint đầu tiên, cập nhật biến này thủ công trên
+        # Dashboard. Redeploy/sync Blueprint không thay đổi secret hiện có.
         sync: false
       - key: LOG_LEVEL
         value: INFO

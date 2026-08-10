@@ -76,6 +76,23 @@ class ChatRequest(BaseModel):
 
 
 # ─────────────────────────────────────────────────────────────
+# Service index
+# ─────────────────────────────────────────────────────────────
+@app.get("/")
+def root():
+    """Hiển thị thông tin API khi mở domain bằng trình duyệt."""
+    return {
+        "status": "ok",
+        "service": SERVICE_NAME,
+        "version": SERVICE_VERSION,
+        "docs": "/docs",
+        "health": "/healthz",
+        "readiness": "/readyz",
+        "chat": "POST /chat",
+    }
+
+
+# ─────────────────────────────────────────────────────────────
 # Health & readiness
 # ─────────────────────────────────────────────────────────────
 @app.get("/healthz")
